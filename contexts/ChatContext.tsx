@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState, ReactNode } from 'react'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
 import type { Message } from '@/types/chat'
+import { firestore } from '@/db/firebase'
 
 interface ChatContextType {
   messages: Message[]
@@ -18,14 +18,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const q = query(collection(db, 'messages'), orderBy('timestamp', 'asc'))
-    
+    const q = query(collection(firestore, 'messages'), orderBy('timestamp', 'asc'))
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const messages = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Message[]
-      
+
       setMessages(messages)
       setLoading(false)
     })

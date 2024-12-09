@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { Login } from '@/components/Login/login'
 import { Signup } from '@/components/Signup/signup'
-import { firebaseConfig } from '@/db/firebase'
-
+import { auth } from '@/db/firebase'
 export function AuthView() {
   const [showLogin, setShowLogin] = useState(true)
 
@@ -17,12 +16,12 @@ export function AuthView() {
             {showLogin ? 'Sign in to continue' : 'Create an account to get started'}
           </p>
         </div>
-        
+
         <div className="bg-card bg-opacity-50 backdrop-blur-lg rounded-lg shadow-xl">
           {showLogin ? (
             <Login
               onSwitchToSignup={() => setShowLogin(false)}
-              firebaseConfig={firebaseConfig}
+              firebaseConfig={auth}
             />
           ) : (
             <Signup onSwitchToLogin={() => setShowLogin(true)} />

@@ -1,8 +1,9 @@
 import { useContext } from 'react'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
 import { ChatContext } from '@/contexts/ChatContext'
 import { useAuth } from '@/hooks/useAuth'
+import { getFirestore } from 'firebase/firestore'
+import { firestore } from '@/db/firebase'
 
 export function useChat() {
   const { messages } = useContext(ChatContext)
@@ -12,7 +13,7 @@ export function useChat() {
     if (!user) return
 
     try {
-      await addDoc(collection(db, 'messages'), {
+      await addDoc(collection(firestore, 'messages'), {
         content,
         userId: user.uid,
         userEmail: user.email,
