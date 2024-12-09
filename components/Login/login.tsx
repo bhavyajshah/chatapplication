@@ -1,32 +1,72 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Formik, Field, Form } from 'formik'
-import * as Yup from 'yup'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { initializeApp } from 'firebase/app'
+import { firebaseConfig } from '@/db/firebase'
+import { toast } from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 interface LoginProps {
-  onSwitchToSignup: () => void
+  onSwitchToSignup: () => void,
+  firebaseConfig: {
+  }
 }
 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
 export function Login({ onSwitchToSignup }: LoginProps) {
+  const history = useRouter();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = (e: any) => {
-    e.preventDefault()
-    console.log('Login attempt:', email, password)
+    e.preventDefault();
+    console.log('Login attempt:', email, password);
+
+    // Check if email and password are provided
+    if (!email || !password) {
+      toast.error('Email and password are required.');
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // User signed in successfully.
+        console.log('User signed in:', userCredential.user);
+        toast.success('Login successful!');
+        setEmail('');
+        setPassword('');
+        if (isMounted) {
+          history.push('/chat');
+        }
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.error('Error signing in:', errorCode, errorMessage);
+        toast.error('Error signing in: ' + errorMessage);
+      });
   }
+
+  if (!isMounted) return null;
 
   return (
     <Card className="w-[350px]">
-      <Formik initialValues={{ email: '', password: '' }} onSubmit={handleSubmit}>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Login</CardTitle>
         <CardDescription>Enter your credentials to access your account</CardDescription>
       </CardHeader>
-      <Form>
+      <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -56,8 +96,7 @@ export function Login({ onSwitchToSignup }: LoginProps) {
             Don't have an account? Sign up
           </Button>
         </CardFooter>
-      </Form>
-      </Formik>
+      </form>
     </Card>
   )
 }
