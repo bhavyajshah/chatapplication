@@ -3,13 +3,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-import { firebaseConfig } from '@/db/firebase'
-import { initializeApp } from 'firebase/app'
+import {  createUserWithEmailAndPassword } from 'firebase/auth'
 import { toast } from 'react-hot-toast'
+import { auth } from '@/db/firebase'
 
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
+
 
 interface SignupProps {
   onSwitchToLogin: () => void

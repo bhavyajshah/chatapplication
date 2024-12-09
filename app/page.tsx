@@ -1,26 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { Login } from '@/components/Login/login'
-import { Signup } from '@/components/Signup/signup'
-import { firebaseConfig} from '@/db/firebase'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { AuthView } from '@/components/Auth/AuthView'
 
-export default function AuthPage() {
-  const [showLogin, setShowLogin] = useState(true)
+export default function HomePage() {
+  const router = useRouter()
+  const auth = getAuth()
 
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-lg p-8">
-        {showLogin ? (
-          <Login
-            onSwitchToSignup={() => setShowLogin(false)}
-            firebaseConfig={firebaseConfig}
-          />
-        ) : (
-          <Signup onSwitchToLogin={() => setShowLogin(true)} />
-        )}
-      </div>
-    </div>
-  )
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push('/chat')
+      }
+    })
+
+    return () => unsubscribe()
+  }, [auth, router])
+
+  return <AuthView />
 }
-
